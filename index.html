@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISHWA-IMAGE-DATABASE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" href="https://i.ibb.co/9ZL3tKz/VISHWA-IMAGE-DATABASE-logo.jpg" type="image/x-icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #6C63FF;
+            --secondary: #2A2A2A;
+            --accent: #FF6B6B;
+            --background: #1a1a1a;
+            --card: #2d2d2d;
+            --text: #ffffff;
+            --source-wallpaper: #4CAF50;
+            --source-gimage: #2196F3;
+            --source-pinterest: #E91E63;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--card), var(--secondary));
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: var(--card);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .clear-btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .source-filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .source-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .source-btn.wallpaper { background: var(--source-wallpaper); }
+        .source-btn.gimage { background: var(--source-gimage); }
+        .source-btn.pinterest { background: var(--source-pinterest); }
+
+        .source-btn.active {
+            box-shadow: 0 0 15px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .source-btn:not(.active) {
+            opacity: 0.7;
+        }
+
+        .stats {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--card);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item i {
+            color: var(--primary);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .image-card {
+            background: var(--card);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .image-container {
+            position: relative;
+            padding-top: 75%;
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .source-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .source-badge.wallpaper { background: var(--source-wallpaper); }
+        .source-badge.gimage { background: var(--source-gimage); }
+        .source-badge.pinterest { background: var(--source-pinterest); }
+      .source-btn.pixel { background: #9C27B0; }
+      .source-btn.pixabay { background: #FF9800; }
+      .source-btn.unsplash { background: #000000; }
+      .source-btn.imgur { background: #1bb76e; }
+
+      .source-badge.pixel { background: #9C27B0; }
+      .source-badge.pixabay { background: #FF9800; }
+      .source-badge.unsplash { background: #000000; }
+      .source-badge.imgur { background: #1bb76e; }
+
+        .quality-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(108, 99, 255, 0.8);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+        }
+      .tutorial-toggle {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: var(--primary);
+          color: white;
+          padding: 15px;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+          z-index: 1000;
+          transition: all 0.3s ease;
+      }
+
+      .tutorial-toggle:hover {
+          transform: scale(1.1);
+      }
+
+      .tutorial-modal {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.8);
+          z-index: 1001;
+          overflow-y: auto;
+      }
+
+      .tutorial-content {
+          background: var(--card);
+          max-width: 800px;
+          margin: 40px auto;
+          padding: 30px;
+          border-radius: 20px;
+          position: relative;
+          animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+      }
+
+      .tutorial-close {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background: none;
+          border: none;
+          color: var(--text);
+          cursor: pointer;
+          font-size: 1.5em;
+          transition: color 0.3s ease;
+      }
+
+      .tutorial-close:hover {
+          color: var(--accent);
+      }
+
+      .tutorial-section {
+          margin-bottom: 30px;
+      }
+
+      .tutorial-section h3 {
+          color: var(--primary);
+          margin-bottom: 15px;
+          font-size: 1.3em;
+      }
+
+      .tutorial-step {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+          padding: 15px;
+          background: rgba(108, 99, 255, 0.1);
+          border-radius: 10px;
+      }
+
+      .step-number {
+          background: var(--primary);
+          color: white;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+      }
+
+      .api-key-notice {
+          background: rgba(255, 107, 107, 0.1);
+          border-left: 4px solid var(--accent);
+          padding: 15px;
+          margin: 20px 0;
+          border-radius: 0 10px 10px 0;
+      }
+
+      .source-explanation {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+          margin: 20px 0;
+      }
+
+      .source-item {
+          background: rgba(255, 255, 255, 0.05);
+          padding: 15px;
+          border-radius: 10px;
+      }
+
+      .source-item i {
+          color: var(--primary);
+          margin-right: 8px;
+      }
+
+      /* Add to existing styles */
+      .error-message {
+          background: rgba(255, 87, 87, 0.2);
+          color: #ff5757;
+          padding: 15px;
+          border-radius: 10px;
+          margin: 10px 0;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 87, 87, 0.2);
+            color: #ff5757;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .source-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">VISHWA-IMAGE-DATABASE</h1>
+            <p class="subtitle">Multi-Source Image Discovery Platform</p>
+        </header>
+      <button class="tutorial-toggle" onclick="toggleTutorial()">
+        <i class="fas fa-question"></i>
+      </button>
+
+      <div class="tutorial-modal" id="tutorialModal">
+        <div class="tutorial-content">
+            <button class="tutorial-close" onclick="toggleTutorial()">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="tutorial-section">
+                <h3>Welcome to VISHWA-IMAGE-DATABASE</h3>
+                <p>This powerful platform allows you to search for images across multiple sources simultaneously. Here's how to get started:</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Quick Start Guide</h3>
+                <div class="tutorial-step">
+                    <div class="step-number">1</div>
+                    <div>Enter your search term in the search box at the top of the page</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">2</div>
+                    <div>Select your desired image sources using the filter buttons</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">3</div>
+                    <div>Click the search button or press Enter to start your search</div>
+                </div>
+                <div class="tutorial-step">
+                    <div class="step-number">4</div>
+                    <div>Browse through the results and use the View or Download buttons to interact with images</div>
+                </div>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>Available Sources</h3>
+                <div class="source-explanation">
+                    <div class="source-item">
+                        <i class="fas fa-camera"></i>
+                        <strong>Pixel:</strong> High-quality stock photos
+                    </div>
+                    <div class="source-item">
+                        <i class="fas fa-image"></i>
+                        <strong>Pixabay:</strong> Free-to-use images
+                    </div>
+                    <div class="source-item">
+                        <i class="fas fa-camera-retro"></i>
+                        <strong>Unsplash:</strong> Professional photography
+                    </div>
+                    <div class="source-item">
+                        <i class="fas fa-images"></i>
+                        <strong>Imgur:</strong> Community-shared images
+                    </div>
+                    <div class="source-item">
+                        <i class="fas fa-desktop"></i>
+                        <strong>Wallpaper:</strong> HD wallpapers
+                    </div>
+                    <div class="source-item">
+                        <i class="fab fa-google"></i>
+                        <strong>Google Images:</strong> Web images
+                    </div>
+                    <div class="source-item">
+                        <i class="fab fa-pinterest"></i>
+                        <strong>Pinterest:</strong> Creative inspirations
+                    </div>
+                </div>
+            </div>
+
+            <div class="api-key-notice">
+                <strong>Note:</strong> Some image sources require API keys for access. Make sure you have valid API keys configured.
+            </div>
+        </div>
+      </div>
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search for amazing images...">
+            <button class="btn search-btn">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+            <button class="btn clear-btn">
+                <i class="fas fa-times"></i>
+                Clear
+            </button>
+        </div>
+
+        <div class="source-filters">
+            <button class="source-btn wallpaper active" data-source="wallpaper">
+                <i class="fas fa-images"></i>
+                Wallpapers
+            </button>
+            <button class="source-btn gimage active" data-source="gimage">
+                <i class="fab fa-google"></i>
+                Google Images
+            </button>
+            <button class="source-btn pinterest active" data-source="pinterest">
+                <i class="fab fa-pinterest"></i>
+                Pinterest
+            </button>
+          <button class="source-btn pixel active" data-source="pixel">
+            <i class="fas fa-camera"></i>
+            Pixel
+          </button>
+          <button class="source-btn pixabay active" data-source="pixabay">
+            <i class="fas fa-image"></i>
+            Pixabay
+          </button>
+          <button class="source-btn unsplash active" data-source="unsplash">
+            <i class="fas fa-camera-retro"></i>
+            Unsplash
+          </button>
+          <button class="source-btn imgur active" data-source="imgur">
+            <i class="fas fa-images"></i>
+            Imgur
+          </button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <i class="fas fa-images"></i>
+                <span>Total Images: <span id="image-count">0</span></span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-search"></i>
+                <span>Current Query: <span id="current-query">None</span></span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-filter"></i>
+                <span>Active Sources: <span id="active-sources">All</span></span>
+            </div>
+        </div>
+
+        <div id="error-container"></div>
+        <div class="gallery"></div>
+        <div class="loading" style="display: none;">
+            <i class="fas fa-spinner"></i>
+            Loading images from multiple sources...
+        </div>
+    </div>
+
+    <script>
+      // API Configuration
+      const APIS = {
+          pixel: {
+              url: 'https://www.noobs-api.000.pe/dipto/pixelSearch',
+              queryParam: 'search',
+              extraParams: '&limit=100',
+              responseHandler: (data) => Array.isArray(data) ? data : []
+          },
+          pixabay: {
+              url: 'https://www.noobs-api.000.pe/dipto/pixabaySearch',
+              queryParam: 'search',
+              extraParams: '&limit=100',
+              responseHandler: (data) => Array.isArray(data) ? data : []
+          },
+          unsplash: {
+              url: 'https://www.noobs-api.000.pe/dipto/unsplashSearch',
+              queryParam: 'search',
+              extraParams: '&limit=100',
+              responseHandler: (data) => Array.isArray(data) ? data : []
+          },
+          imgur: {
+              url: 'https://www.noobs-api.000.pe/dipto/imgurSearch',
+              queryParam: 'search',
+              extraParams: '&limit=100',
+              responseHandler: (data) => Array.isArray(data) ? data : []
+          },
+          wallpaper: {
+              url: 'https://api.fgmods.xyz/api/search/wallpaper',
+              queryParam: 'text',
+              extraParams: '',
+              responseHandler: (data) => Array.isArray(data) ? data : []
+          },
+          gimage: {
+              url: 'https://api.ryzendesu.vip/api/search/gimage',
+              queryParam: 'query',
+              extraParams: '',
+              responseHandler: (data) => Array.isArray(data?.result) ? data.result : []
+          },
+          pinterest: {
+              url: 'https://api.ryzendesu.vip/api/search/pinterest',
+              queryParam: 'query',
+              extraParams: '',
+              responseHandler: (data) => Array.isArray(data?.result) ? data.result : []
+          }
+      };
+
+      // DOM Elements
+      const searchBox = document.querySelector('.search-box');
+      const searchBtn = document.querySelector('.search-btn');
+      const clearBtn = document.querySelector('.clear-btn');
+      const gallery = document.querySelector('.gallery');
+      const loading = document.querySelector('.loading');
+      const errorContainer = document.getElementById('error-container');
+      const sourceButtons = document.querySelectorAll('.source-btn');
+
+      // Initialize active sources with all APIs
+      let activeSources = new Set(Object.keys(APIS));
+
+      // Stats Update Function
+      function updateStats() {
+          document.getElementById('image-count').textContent = 
+              document.querySelectorAll('.image-card').length;
+          document.getElementById('current-query').textContent = 
+              searchBox.value.trim() || 'None';
+          document.getElementById('active-sources').textContent = 
+              activeSources.size === 0 ? 'None' : 
+              activeSources.size === Object.keys(APIS).length ? 'All' : 
+              Array.from(activeSources).join(', ');
+      }
+
+      // Error Display Function
+      function showError(message) {
+          const error = document.createElement('div');
+          error.className = 'error-message';
+          error.innerHTML = `<i class="fas fa-exclamation-circle"></i>${message}`;
+          errorContainer.appendChild(error);
+          setTimeout(() => error.remove(), 5000);
+      }
+
+      // API Fetch Function
+      async function fetchFromSource(source, query) {
+          const api = APIS[source];
+          const url = `${api.url}?${api.queryParam}=${encodeURIComponent(query)}${api.extraParams || ''}`;
+
+          try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data = await response.json();
+              return api.responseHandler(data);
+          } catch (error) {
+              showError(`Error fetching from ${source}: ${error.message}`);
+              return [];
+          }
+      }
+
+      // Array Shuffle Function
+      function shuffleArray(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
+      }
+
+      // Image Card Creation Function
+      function createImageCard(imageUrl, source) {
+          const card = document.createElement('div');
+          card.className = 'image-card';
+
+          // Source configuration
+          const sourceConfigs = {
+              pixel: { icon: 'camera', text: 'Pixel' },
+              pixabay: { icon: 'image', text: 'Pixabay' },
+              unsplash: { icon: 'camera-retro', text: 'Unsplash' },
+              imgur: { icon: 'images', text: 'Imgur' },
+              wallpaper: { icon: 'desktop', text: 'Wallpaper' },
+              gimage: { icon: 'google', text: 'GImage' },
+              pinterest: { icon: 'pinterest', text: 'Pinterest' }
+          };
+
+          const config = sourceConfigs[source];
+
+          card.innerHTML = `
+              <div class="image-container">
+                  <img src="${imageUrl}" alt="Image" loading="lazy" onerror="this.closest('.image-card').remove(); updateStats();">
+                  <div class="source-badge ${source}">
+                      <i class="fas fa-${config.icon}"></i>
+                      ${config.text}
+                  </div>
+                  <div class="quality-badge">
+                      <i class="fas fa-crown"></i>
+                      HD
+                  </div>
+                  <div class="image-overlay">
+                      <div class="action-buttons">
+                          <button class="action-btn" onclick="window.open('${imageUrl}', '_blank')">
+                              <i class="fas fa-eye"></i>
+                              View
+                          </button>
+                          <a href="${imageUrl}" class="action-btn" download target="_blank">
+                              <i class="fas fa-download"></i>
+                              Download
+                          </a>
+                      </div>
+                  </div>
+              </div>
+          `;
+
+          return card;
+      }
+
+      // Main Search Function
+      async function searchImages(query) {
+          if (!query || activeSources.size === 0) {
+              showError('Please enter a search term and select at least one source');
+              return;
+          }
+
+          gallery.innerHTML = '';
+          errorContainer.innerHTML = '';
+          loading.style.display = 'flex';
+
+          try {
+              const fetchPromises = Array.from(activeSources).map(source => 
+                  fetchFromSource(source, query)
+              );
+
+              const results = await Promise.allSettled(fetchPromises);
+              const allImages = [];
+
+              results.forEach((result, index) => {
+                  if (result.status === 'fulfilled') {
+                      const source = Array.from(activeSources)[index];
+                      result.value.forEach(imageUrl => {
+                          allImages.push({ url: imageUrl, source });
+                      });
+                  }
+              });
+
+              shuffleArray(allImages);
+
+              if (allImages.length === 0) {
+                  gallery.innerHTML = '<div class="no-results">No images found. Try a different search term or source.</div>';
+              } else {
+                  allImages.forEach(image => {
+                      gallery.appendChild(createImageCard(image.url, image.source));
+                  });
+              }
+          } catch (error) {
+              showError(`Error during search: ${error.message}`);
+          } finally {
+              loading.style.display = 'none';
+              updateStats();
+          }
+      }
+
+      // Source Toggle Event Listeners
+      sourceButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+              const source = btn.dataset.source;
+              btn.classList.toggle('active');
+
+              if (btn.classList.contains('active')) {
+                  activeSources.add(source);
+              } else {
+                  activeSources.delete(source);
+              }
+
+              if (searchBox.value.trim()) {
+                  searchImages(searchBox.value.trim());
+              }
+              updateStats();
+          });
+      });
+
+      // Search Event Listeners
+      searchBtn.addEventListener('click', () => {
+          const query = searchBox.value.trim();
+          if (query) searchImages(query);
+      });
+
+      clearBtn.addEventListener('click', () => {
+          searchBox.value = '';
+          gallery.innerHTML = '';
+          errorContainer.innerHTML = '';
+          updateStats();
+      });
+
+      searchBox.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              const query = searchBox.value.trim();
+              if (query) searchImages(query);
+          }
+      });
+
+      // Tutorial Toggle Function
+      function toggleTutorial() {
+          const modal = document.getElementById('tutorialModal');
+          modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+      }
+
+      // Initialize Tutorial Modal
+      document.addEventListener('DOMContentLoaded', () => {
+          document.getElementById('tutorialModal').style.display = 'none';
+      });
+
+      // Close Tutorial When Clicking Outside
+      document.getElementById('tutorialModal').addEventListener('click', (e) => {
+          if (e.target === document.getElementById('tutorialModal')) {
+              toggleTutorial();
+          }
+      });
+
+      // Error Boundary for Failed Image Loads
+      window.addEventListener('error', (e) => {
+          if (e.target.tagName === 'IMG') {
+              e.target.closest('.image-card')?.remove();
+              updateStats();
+          }
+      }, true);
+
+      // Initial Stats Update
+      updateStats();
+
+    </script>
+</body>
+</html>
