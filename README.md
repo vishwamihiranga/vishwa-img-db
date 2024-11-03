@@ -26,7 +26,7 @@ Welcome to **VISHWA-IMG-DATABASE**! This project is an image library website des
 Follow these steps to get the most out of **VISHWA-IMG-DATABASE**:
 
 ### Step 1: Access the Website
-Head over to [Vishwa Image DB](https://your-website-url-here.com) to begin exploring the collection.
+Head over to [Vishwa Image DB](https://vishwa-img-db.netlify.app/) to begin exploring the collection.
 
 ### Step 2: Browse Images
 On the main page, you'll see an array of images ready to be browsed. Scroll through the collection to find images you're interested in.
