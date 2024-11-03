@@ -2,15 +2,24 @@
 
 Welcome to **VISHWA-IMG-DATABASE**! This project is an image library website designed to offer a visually stunning, user-friendly platform for browsing and viewing images with ease.
 
-![Vishwa Image DB Screenshot 1](https://i.ibb.co/P48mJJZ/image.png)
-![Vishwa Image DB Screenshot 2](https://i.ibb.co/55SHT9T/image.png)
+<p align="center">
+  <img src="https://i.ibb.co/P48mJJZ/image.png" alt="Vishwa Image DB Screenshot 1">
+  <img src="https://i.ibb.co/55SHT9T/image.png" alt="Vishwa Image DB Screenshot 2">
+</p>
 
 ## 🚀 Features
-
 * **Sleek & Modern Interface:** A clean and intuitive design for easy navigation
 * **Fast Loading:** Optimized performance for quick access to images
 * **Responsive Layout:** Fully mobile-friendly, accessible on any device
 * **Professional Look:** Simple and effective layout with minimal distractions
+* **Multi-Source Integration:** Images from leading platforms including:
+  * Wallpapers
+  * Google Images
+  * Pinterest
+  * Pixel
+  * Pixabay
+  * Unsplash
+  * Imgur
 
 ## 🛠️ How to Use
 
@@ -45,29 +54,38 @@ git clone https://github.com/vishwamihiranga/vishwa-img-database.git
 cd vishwa-img-database
 ```
 
-3. **Install Dependencies**
-```bash
-npm install
-```
+3. **Open the Project in Your Browser**
+Open the index.html file in your browser to view the website locally.
 
-4. **Run the Project**
-```bash
-npm start
-```
+## 👤 Author & Contact
 
-5. **Access the Project**
-Open your browser and go to `http://localhost:3000`
-
-## 👤 Author
-
-* **Vishwa Mihiranga**
+### Vishwa Mihiranga
 * GitHub: [@vishwamihiranga](https://github.com/vishwamihiranga)
+* Email: vishwamihi@gmail.com
+* Telegram: [vishwa_2_2](https://t.me/vishwa_2_2)
+* Instagram: [@x_vishwa_22](https://www.instagram.com/x_vishwa_22)
+* Whatsapp: [vishwamihiranga](wa.me/94702481115?text=Hello👋)
 
 Feel free to reach out for any questions or collaboration!
+
+## 🖼️ Image Sources
+
+This project aggregates images from several popular image platforms:
+
+* **Wallpapers** - High-quality wallpapers for desktop and mobile
+* **Google Images** - Broad image search results
+* **Pinterest** - Curated collections and inspiration
+* **Pixel** - Professional stock photos
+* **Pixabay** - Free-to-use images
+* **Unsplash** - High-resolution photos
+* **Imgur** - Community-shared images
+
+All images are sourced according to their respective terms of use and attribution requirements.
 
 ## 📝 License
 
 This project is [MIT](LICENSE) licensed.
 
 ---
+
 Made with ❤️ by Vishwa Mihiranga
