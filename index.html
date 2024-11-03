@@ -425,6 +425,100 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            padding: 40px;
+            overflow: auto;
+        }
+
+        .preview-content {
+            position: relative;
+            max-width: 90%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 80vh;
+            margin: 0 auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .preview-close {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .preview-close:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        .preview-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .preview-download {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .preview-download:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .download-progress {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card);
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
 
         .error-message {
             background: rgba(255, 87, 87, 0.2);
@@ -459,6 +553,7 @@
         <header class="header">
             <h1 class="logo">VISHWA-IMAGE-DATABASE</h1>
             <p class="subtitle">Multi-Source Image Discovery Platform</p>
+            <p class="subtitle">Developed By Vishwa Mihiranga</p>
         </header>
       <button class="tutorial-toggle" onclick="toggleTutorial()">
         <i class="fas fa-question"></i>
@@ -472,7 +567,7 @@
 
             <div class="tutorial-section">
                 <h3>Welcome to VISHWA-IMAGE-DATABASE</h3>
-                <p>This powerful platform allows you to search for images across multiple sources simultaneously. Here's how to get started:</p>
+                <p>This powerful platform allows you to search for images across multiple sources simultaneously.this Moden developed By Vishwa Mihiranga Here's how to get started:</p>
             </div>
 
             <div class="tutorial-section">
@@ -591,7 +686,24 @@
                 <span>Active Sources: <span id="active-sources">All</span></span>
             </div>
         </div>
-
+        <div class="preview-modal" id="previewModal">
+            <div class="preview-content">
+                <button class="preview-close" onclick="closePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <img class="preview-image" id="previewImage" alt="Preview">
+                <div class="preview-actions">
+                    <button class="preview-download" onclick="downloadImage()">
+                        <i class="fas fa-download"></i>
+                        Download Image
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="download-progress">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Downloading image...</span>
+        </div>
         <div id="error-container"></div>
         <div class="gallery"></div>
         <div class="loading" style="display: none;">
@@ -601,51 +713,206 @@
     </div>
 
     <script>
-      // API Configuration
-      const APIS = {
-          pixel: {
-              url: 'https://www.noobs-api.000.pe/dipto/pixelSearch',
-              queryParam: 'search',
-              extraParams: '&limit=100',
-              responseHandler: (data) => Array.isArray(data) ? data : []
-          },
-          pixabay: {
-              url: 'https://www.noobs-api.000.pe/dipto/pixabaySearch',
-              queryParam: 'search',
-              extraParams: '&limit=100',
-              responseHandler: (data) => Array.isArray(data) ? data : []
-          },
-          unsplash: {
-              url: 'https://www.noobs-api.000.pe/dipto/unsplashSearch',
-              queryParam: 'search',
-              extraParams: '&limit=100',
-              responseHandler: (data) => Array.isArray(data) ? data : []
-          },
-          imgur: {
-              url: 'https://www.noobs-api.000.pe/dipto/imgurSearch',
-              queryParam: 'search',
-              extraParams: '&limit=100',
-              responseHandler: (data) => Array.isArray(data) ? data : []
-          },
-          wallpaper: {
-              url: 'https://api.fgmods.xyz/api/search/wallpaper',
-              queryParam: 'text',
-              extraParams: '',
-              responseHandler: (data) => Array.isArray(data) ? data : []
-          },
-          gimage: {
-              url: 'https://api.ryzendesu.vip/api/search/gimage',
-              queryParam: 'query',
-              extraParams: '',
-              responseHandler: (data) => Array.isArray(data?.result) ? data.result : []
-          },
-          pinterest: {
-              url: 'https://api.ryzendesu.vip/api/search/pinterest',
-              queryParam: 'query',
-              extraParams: '',
-              responseHandler: (data) => Array.isArray(data?.result) ? data.result : []
-          }
-      };
+        const APIS = {
+            pixel: {
+                url: 'https://www.noobs-api.000.pe/dipto/pixelSearch',
+                queryParam: 'search',
+                extraParams: '&limit=100',
+                responseHandler: (data) => Array.isArray(data) ? data : []
+            },
+            pixabay: {
+                url: 'https://www.noobs-api.000.pe/dipto/pixabaySearch',
+                queryParam: 'search',
+                extraParams: '&limit=100',
+                responseHandler: (data) => Array.isArray(data) ? data : []
+            },
+            unsplash: {
+                url: 'https://www.noobs-api.000.pe/dipto/unsplashSearch',
+                queryParam: 'search',
+                extraParams: '&limit=100',
+                responseHandler: (data) => {
+                    try {
+                        // Check if data has imgUrlFull array
+                        if (data && Array.isArray(data.imgUrlFull)) {
+                            return data.imgUrlFull.filter(url => {
+                                try {
+                                    new URL(url);
+                                    return url.startsWith('http') || url.startsWith('https');
+                                } catch {
+                                    return false;
+                                }
+                            });
+                        }
+                        return [];
+                    } catch (error) {
+                        console.error('Error parsing unsplash response:', error);
+                        return [];
+                    }
+                }
+            },
+            imgur: {
+                url: 'https://www.noobs-api.000.pe/dipto/imgurSearch',
+                queryParam: 'search',
+                extraParams: '&limit=100',
+                responseHandler: (data) => {
+                    try {
+                        // Check if data has jpegPng array
+                        if (data && Array.isArray(data.jpegPng)) {
+                            return data.jpegPng.filter(url => {
+                                try {
+                                    new URL(url);
+                                    return url.startsWith('http') || url.startsWith('https');
+                                } catch {
+                                    return false;
+                                }
+                            });
+                        }
+                        return [];
+                    } catch (error) {
+                        console.error('Error parsing imgur response:', error);
+                        return [];
+                    }
+                }
+            },
+            wallpaper: {
+                url: 'https://api.fgmods.xyz/api/search/wallpaper',
+                queryParam: 'text',
+                extraParams: '&apikey=Cu5RXZLd',
+                responseHandler: (data) => {
+                    try {
+                        if (data && Array.isArray(data.result)) {
+                            const allImages = data.result.reduce((acc, item) => {
+                                if (item.image && Array.isArray(item.image)) {
+                                    const filteredImages = item.image.filter(url => 
+                                        !url.includes('_w297.webp') && 
+                                        !url.includes('_w330.webp')
+                                    );
+                                    acc.push(...filteredImages);
+                                }
+                                return acc;
+                            }, []);
+
+                            return [...new Set(allImages)].filter(url => {
+                                try {
+                                    new URL(url);
+                                    return url.startsWith('http') || url.startsWith('https');
+                                } catch {
+                                    return false;
+                                }
+                            });
+                        }
+                        return [];
+                    } catch (error) {
+                        console.error('Error parsing wallpaper response:', error);
+                        return [];
+                    }
+                }
+            },
+            gimage: {
+                url: 'https://api.ryzendesu.vip/api/search/gimage',
+                queryParam: 'query',
+                extraParams: '&apikey=Cu5RXZLd',
+                responseHandler: (data) => {
+                    try {
+                        if (data && Array.isArray(data)) return data;
+                        if (data && Array.isArray(data.result)) return data.result;
+                        if (data && typeof data === 'object' && data.status === 'success') {
+                            return Array.isArray(data.data) ? data.data : [];
+                        }
+                        return [];
+                    } catch (error) {
+                        console.error('Error parsing gimage response:', error);
+                        return [];
+                    }
+                }
+            },
+            pinterest: {
+                url: 'https://api.ryzendesu.vip/api/search/pinterest',
+                queryParam: 'query',
+                extraParams: '&apikey=Cu5RXZLd',
+                responseHandler: (data) => {
+                    try {
+                        if (data && Array.isArray(data)) return data;
+                        if (data && Array.isArray(data.result)) return data.result;
+                        if (data && typeof data === 'object' && data.status === 'success') {
+                            return Array.isArray(data.data) ? data.data : [];
+                        }
+                        return [];
+                    } catch (error) {
+                        console.error('Error parsing pinterest response:', error);
+                        return [];
+                    }
+                }
+            }
+        };
+
+        // Enhanced fetchFromSource function with retries and better error handling
+        async function fetchFromSource(source, query) {
+            const api = APIS[source];
+            const url = `${api.url}?${api.queryParam}=${encodeURIComponent(query)}${api.extraParams || ''}`;
+            const maxRetries = 2;
+            let attempt = 0;
+
+            while (attempt <= maxRetries) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Check if the API returned an error message
+                    if (data.error || data.status === 'error') {
+                        throw new Error(data.message || 'API returned an error');
+                    }
+
+                    const results = api.responseHandler(data);
+
+                    // Filter out invalid URLs and duplicates
+                    const validResults = [...new Set(results)].filter(url => {
+                        try {
+                            new URL(url);
+                            return (url.startsWith('http') || url.startsWith('https')) && !url.includes('undefined');
+                        } catch {
+                            return false;
+                        }
+                    });
+
+                    if (validResults.length === 0 && attempt < maxRetries) {
+                        attempt++;
+                        continue;
+                    }
+
+                    return validResults;
+
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed for ${source}:`, error);
+                    if (attempt === maxRetries) {
+                        showError(`Error fetching from ${source}: ${error.message}`);
+                        return [];
+                    }
+                    attempt++;
+                }
+            }
+            return [];
+        }
+
+        // Add this function to handle failed image loads more gracefully
+        function handleImageError(img) {
+            const card = img.closest('.image-card');
+            if (card) {
+                card.remove();
+                updateStats();
+            }
+        }
 
       // DOM Elements
       const searchBox = document.querySelector('.search-box');
@@ -681,22 +948,6 @@
       }
 
       // API Fetch Function
-      async function fetchFromSource(source, query) {
-          const api = APIS[source];
-          const url = `${api.url}?${api.queryParam}=${encodeURIComponent(query)}${api.extraParams || ''}`;
-
-          try {
-              const response = await fetch(url);
-              if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-              }
-              const data = await response.json();
-              return api.responseHandler(data);
-          } catch (error) {
-              showError(`Error fetching from ${source}: ${error.message}`);
-              return [];
-          }
-      }
 
       // Array Shuffle Function
       function shuffleArray(array) {
@@ -706,53 +957,104 @@
           }
           return array;
       }
+        let currentImageUrl = '';
 
+        function showPreview(imageUrl) {
+            currentImageUrl = imageUrl;
+            const modal = document.getElementById('previewModal');
+            const previewImage = document.getElementById('previewImage');
+
+            previewImage.src = imageUrl;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('previewModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        async function downloadImage() {
+            const progress = document.querySelector('.download-progress');
+            progress.style.display = 'flex';
+
+            try {
+                const response = await fetch(currentImageUrl);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `image-${Date.now()}.jpg`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                showError('Error downloading image. Please try again.');
+            } finally {
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                }, 2000);
+            }
+        }
       // Image Card Creation Function
-      function createImageCard(imageUrl, source) {
-          const card = document.createElement('div');
-          card.className = 'image-card';
+        function createImageCard(imageUrl, source) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
 
-          // Source configuration
-          const sourceConfigs = {
-              pixel: { icon: 'camera', text: 'Pixel' },
-              pixabay: { icon: 'image', text: 'Pixabay' },
-              unsplash: { icon: 'camera-retro', text: 'Unsplash' },
-              imgur: { icon: 'images', text: 'Imgur' },
-              wallpaper: { icon: 'desktop', text: 'Wallpaper' },
-              gimage: { icon: 'google', text: 'GImage' },
-              pinterest: { icon: 'pinterest', text: 'Pinterest' }
-          };
+            const sourceConfigs = {
+                pixel: { icon: 'camera', text: 'Pixel' },
+                pixabay: { icon: 'image', text: 'Pixabay' },
+                unsplash: { icon: 'camera-retro', text: 'Unsplash' },
+                imgur: { icon: 'images', text: 'Imgur' },
+                wallpaper: { icon: 'desktop', text: 'Wallpaper' },
+                gimage: { icon: 'google', text: 'GImage' },
+                pinterest: { icon: 'pinterest', text: 'Pinterest' }
+            };
 
-          const config = sourceConfigs[source];
+            const config = sourceConfigs[source];
 
-          card.innerHTML = `
-              <div class="image-container">
-                  <img src="${imageUrl}" alt="Image" loading="lazy" onerror="this.closest('.image-card').remove(); updateStats();">
-                  <div class="source-badge ${source}">
-                      <i class="fas fa-${config.icon}"></i>
-                      ${config.text}
-                  </div>
-                  <div class="quality-badge">
-                      <i class="fas fa-crown"></i>
-                      HD
-                  </div>
-                  <div class="image-overlay">
-                      <div class="action-buttons">
-                          <button class="action-btn" onclick="window.open('${imageUrl}', '_blank')">
-                              <i class="fas fa-eye"></i>
-                              View
-                          </button>
-                          <a href="${imageUrl}" class="action-btn" download target="_blank">
-                              <i class="fas fa-download"></i>
-                              Download
-                          </a>
-                      </div>
-                  </div>
-              </div>
-          `;
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${imageUrl}" alt="Image" loading="lazy" onerror="this.closest('.image-card').remove(); updateStats();">
+                    <div class="source-badge ${source}">
+                        <i class="fas fa-${config.icon}"></i>
+                        ${config.text}
+                    </div>
+                    <div class="quality-badge">
+                        <i class="fas fa-crown"></i>
+                        HD
+                    </div>
+                    <div class="image-overlay">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="showPreview('${imageUrl}')">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                            <button class="action-btn" onclick="downloadImage('${imageUrl}')">
+                                <i class="fas fa-download"></i>
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
 
-          return card;
-      }
+            return card;
+        }
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('previewModal')) {
+                closePreview();
+            }
+        });
+
+        // Close preview with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePreview();
+            }
+        });
 
       // Main Search Function
       async function searchImages(query) {
